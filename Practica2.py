@@ -7,17 +7,20 @@ def obtener_tablaprincipal(archivo_csv):
     with open(archivo_csv, 'r') as file: #Leer solo la primera fila del CSV para obtener los nombres de las columnas
         column_names = next(file).strip().split(',')
     column_names.remove('number_players')
+
+    columnstrings = ['platform','developer','genre']
     # Crear un DataFrame del CSV
-    df = pd.read_csv(archivo_csv, na_values=[''])
+    df = pd.read_csv(archivo_csv, na_values=[''],dtype={columna: str for columna in columnstrings})
     df = df.fillna("N/A")
 
     df = df.drop(df.columns[4], axis=1)
-    
+    df['release_date'] = pd.to_datetime(df.release_date, format = '%b %d, %Y')
+
     return df ,column_names
 
-def imprimir_dataframe_en_ventana(df,column):
+def imprimir_dataframe_en_ventana(df,column,nombre):
     ventana = tk.Tk()  # Crear la ventana principal
-    ventana.title("Tablas")
+    ventana.title(nombre)
     ventana.config(width=1000, height=500)
 
     frame_tabla = ttk.Frame(ventana)  # Crear un Frame para la tabla y la barra de desplazamiento
@@ -44,9 +47,11 @@ def imprimir_dataframe_en_ventana(df,column):
     # Inicia el bucle principal de la aplicación
     ventana.mainloop()
 
-# Llamar a la función para obtener el DataFrame
-archivo_csv = 'archive/metacritic_games.csv'
-df ,columnas= obtener_tablaprincipal(archivo_csv)
+if __name__=="__main__":
+   
+  # Llamar a la función para obtener el DataFrame
+   archivo_csv = 'archive/metacritic_games.csv'
+   df ,columnas= obtener_tablaprincipal(archivo_csv)
 
-# Llamar a la función para imprimir el DataFrame en la ventana
-imprimir_dataframe_en_ventana(df, columnas)
+   # Llamar a la función para imprimir el DataFrame en la ventana
+   imprimir_dataframe_en_ventana(df, columnas, "Tabla Principal")
